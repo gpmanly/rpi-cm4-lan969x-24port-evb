@@ -25,12 +25,12 @@ Once built, the kernel image, modules, and device tree blobs are installed onto 
 * Oculink Cable
 * Oculink PCIe X1 to SFF-8612
 
-| ![RPi CM4 and IO Board](raspi-cm4-1.png)                 | ![](234870644e6d625d91fdaa40bb68.l.png)         |
+| ![RPi CM4 and IO Board](attachments/raspi-cm4-1.png)                 | ![](attachments/234870644e6d625d91fdaa40bb68.l.png)         |
 | -------------------------------------------------------- | ----------------------------------------------- |
-| ![Oculink PCIe X1 to SFF-8612](oculink-pcie-sff.png)<br> | ![Oculink Cable](oculink-cable.png) |
+| ![Oculink PCIe X1 to SFF-8612](attachments/oculink-pcie-sff.png)<br> | ![Oculink Cable](attachments/oculink-cable.png) |
 
 Overall set up:
-![overall-set-up](lan969x-pcie-rpicm4.jpg)
+![overall-set-up](attachments/lan969x-pcie-rpicm4.jpg)
 
 ---
 ## **Configure LAN969x-24port EVB as PCIe Endpoint:**
@@ -43,38 +43,38 @@ The LAN969x-24port EVB must be setup to run as a PCIe endpoint. On this page,[ht
 3. Open **`fwu-lan969x_a0-release.html`** with [Google Chrome](https://www.google.com/intl/en_ph/chrome/) (with javescript enabled (`CTRL+SHIFT+i`))
 4. Click "Connect" MCP2200 USB Serial Port Emulator (COMx) with 115200 baud. Transaction log should show:
 ```
-Connected
-Identify platform...
-Version: BL1:v2.6(release):lan969x-a0-bl1-rc2
-Identified device: LAN969X A0
-Please select a BL1 command - or upload BL2U for firmware update functions
+        Connected
+        Identify platform...
+        Version: BL1:v2.6(release):lan969x-a0-bl1-rc2
+        Identified device: LAN969X A0
+        Please select a BL1 command - or upload BL2U for firmware update functions
 ```
 5. Click "Download BL2U" 
 6. Upload the **`lan969x_pcie-release.fip.gz`** in the "Upload" Tab. Log should show:
 ```
-Reading file: lan969x_pcie-release.fip.gz
-DDR initialized and cache enabled
-Downloading 89034 bytes binary
-Download took: 9 seconds, 671 milliseconds
-Download was completed
-Calculating download data hash
-89034 bytes in write buffer
-SHA-256 hash: bd33d3a383b61e83ebfba1eae0068fff8d9adfc5270624a2cc859f7454029785
-Data integrity check pass, SHA-256 hash match
-Decompressing data
-Decompressing took: 14 milliseconds
-Calculating download data hash
-179712 bytes in write buffer
-SHA-256 hash: fd1904c2fa58990b4ae19432bcf6c283d55f49e306665b991a24834a6334bae6
+        Reading file: lan969x_pcie-release.fip.gz
+        DDR initialized and cache enabled
+        Downloading 89034 bytes binary
+        Download took: 9 seconds, 671 milliseconds
+        Download was completed
+        Calculating download data hash
+        89034 bytes in write buffer
+        SHA-256 hash: bd33d3a383b61e83ebfba1eae0068fff8d9adfc5270624a2cc859f7454029785
+        Data integrity check pass, SHA-256 hash match
+        Decompressing data
+        Decompressing took: 14 milliseconds
+        Calculating download data hash
+        179712 bytes in write buffer
+        SHA-256 hash: fd1904c2fa58990b4ae19432bcf6c283d55f49e306665b991a24834a6334bae6
 ```
 7. Write **`lan969x_pcie-release.fip.gz`** in the tab “**Write**” by changing to NOR in the line with the text "Write Flash Image". Then press "Write Flash Image" button.
-	- ![](Pasted-image-20260330092249.png)
+	- ![](attachments/Pasted-image-20260330092249.png)
 	- Log should show:
 ```
-Starting Write Image to NOR Flash
-This may take up to 5 minutes or even longer depending on data size and media.
-Write Image to NOR Flash took: 1 second, 724 milliseconds
-Image written and verified
+        Starting Write Image to NOR Flash
+        This may take up to 5 minutes or even longer depending on data size and media.
+        Write Image to NOR Flash took: 1 second, 724 milliseconds
+        Image written and verified
 ```
 8. When done writing the image, change the VCORE[3..0]=1000, so that the device boot from NOR when booting.
 9. Power cycle the board to bring up the PCIe. Check by closing the chrome and starting teraterm and connecting to the LAN969x board. When Power cycling it will write a short list of lines to the terminal ending with "`NOTICE: pcie: Config EP`".
@@ -105,6 +105,7 @@ sudo apt install bc bison flex libssl-dev make libc6-dev libncurses5-dev crossbu
 ```
 
 The Linux Kernel we will use is from the Microchip's Fork. The kernel version we'll be using is `v6.12`--the latest version as of this writing. We will also use the `bcm2711_defconfig` from Raspberry Pi's Fork as the base config.
+
 ### 1. Prepare the Linux-UNG Repository
 ```shell
 git clone https://github.com/microchip-ung/linux linux-ung
@@ -128,6 +129,7 @@ git fetch rpi rpi-6.12.y
 git checkout rpi/rpi-6.12.y -- arch/arm64/configs/bcm2711_defconfig
 ```
 > **Note:** The version of the defconfig should match with our target version.
+
 ### 3. Build Configuration
 ```shell
 # for 64-bit
@@ -192,6 +194,7 @@ Save and Exit
 <Save>
 <Exit>
 ```
+
 ### 4. Prepare the Device-Tree
 Copy the device tree sources `dts` and overlays `dtso` from Raspberry Pi Repository:
 ```shell
@@ -256,6 +259,7 @@ make -j12 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- Image modules dtbs
 
 ## **Install the Microchip Linux Kernel**
 Having built the kernel, copy it onto the Raspberry Pi OS 64-bit Image and install the modules.
+
 ### 1. Mount Boot Media
 First, run `lsblk`. Then, connect the boot media. Run `lsblk` again; the new device represents the boot media. See output similar to the following:
 ```shell
@@ -273,10 +277,12 @@ mkdir mnt/root
 sudo mount /dev/sdc1 mnt/boot
 sudo mount /dev/sdc2 mnt/root
 ```
+
 ### 2. Next, install the kernel modules onto the boot media:
 ```shell
 sudo env PATH=$PATH make -j12 ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=mnt/root modules_install
 ```
+
 ### 3. Install Kernel onto the boot media:
 Run the following commands to create a backup image of the current kernel, install the fresh kernel image, overlays.
 ```shell
@@ -323,6 +329,7 @@ Finally, connect the boot media to the Raspberry Pi and connect it to power to r
 ---
 ## **Verification**
 Boot the Raspberry Pi with the newly modified Boot Media
+
 ### Show Linux Version
 ```shell
 uname –a
@@ -330,6 +337,7 @@ uname –a
 #It should return the following
 Linux raspberrypi 6.12.48-v8+ #42 SMP PREEMPT Fri Mar 27 16:31:28 PST 2026 aarch64 GNU/Linux
 ```
+
 ### Show that the LAN969x driver is loaded and enumerated.
 ```shell
 $ lspci -vv
@@ -509,9 +517,9 @@ Connecting to host 10.0.1.2, port 5201
 ```
 
 ## Screenshots of the Actual Result
-![](Pasted-image-20260330083400.png)
-![](Pasted-image-20260330083200.png)
-![](Pasted-image-20260330083212.png)
-![](Pasted-image-20260330083237.png)
+![](attachments/Pasted-image-20260330083400.png)
+![](attachments/Pasted-image-20260330083200.png)
+![](attachments/Pasted-image-20260330083212.png)
+![](attachments/Pasted-image-20260330083237.png)
 
 ---
